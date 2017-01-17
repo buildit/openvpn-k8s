@@ -1,11 +1,13 @@
-# offlinehacker/openvpn-k8s
+# builditdigital/openvpn-k8s
 
 - [Introduction](#introduction)
 - [Contributing](#contributing)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
+- [Helm-based installation](#helm-based-installation)
+- [Manual Installation](#installation)
 - [Quick Start](#quick-start)
 - [Configuration Parameters](#configuration-parameters)
+- [LDAP authentication troubleshooting](#ldap-authentication-troubleshooting)
 
 # Introduction
 
@@ -16,22 +18,26 @@ Dockerfile to run [openvpn](https://openvpn.net/) inside [kubernetes](http://kub
 If you find this image useful you can help by doing one of the following:
 
 - *Send a Pull Request*: you can add new features to the docker image, which will be integrated into the official image.
-- *Report a Bug*: if you notice a bug, please issue a bug report at [Issues](https://github.com/offlinehacker/openvpn-k8s/issues), so we can fix it as soon as possible.
+- *Report a Bug*: if you notice a bug, please issue a bug report at [Issues](https://github.com/builditdigital/openvpn-k8s/issues), so we can fix it as soon as possible.
 
-# Installation
+# Helm-based installation
 
-Automated builds of the image are available on [Dockerhub](https://hub.docker.com/r/offlinehacker/openvpn-k8s) and is the recommended method of installation.
+Check [electroma/charts](https://github.com/electroma/charts/tree/master/digitalrig/openvpn-k8s) repository. 
+
+# Manual Installation
+
+Automated builds of the image are available on [Dockerhub](https://hub.docker.com/r/electroma/openvpn-k8s) and is the recommended method of installation.
 
 ```bash
-docker pull offlinehacker/openvpn-k8s:latest
+docker pull builditdigital/openvpn-k8s:latest
 ```
 
 Alternatively you can build the image locally.
 
 ```bash
-git clone https://github.com/offlinehacker/openvpn-k8s.git
+git clone https://github.com/electroma/openvpn-k8s.git
 cd openvpn
-docker build -t offlinehacker/openvpn-k8s .
+docker build -t builditdigital/openvpn-k8s .
 ```
 
 # OpenVPN LDAP authentication
@@ -95,7 +101,7 @@ spec:
     spec:
       containers:
         - name: openvpn
-          image: offlinehacker/openvpn-k8s
+          image: builditdigital/openvpn-k8s
           securityContext:
             capabilities:
               add:
