@@ -14,6 +14,12 @@
 
 Dockerfile to run [openvpn](https://openvpn.net/) inside [kubernetes](http://kubernetes.io/).
 
+Features:
+- Client certificate authentication
+- LDAP name/password authentication
+- Option to push routes to the host and pod subnets
+- DNS server and default domain name are inherited from the pod configuration
+
 # Contributing
 
 If you find this image useful you can help by doing one of the following:
@@ -150,8 +156,6 @@ Below is the complete list of available options that can be used to customize yo
 - **OVPN_NATDEVICE**: Device connected to kuberentes service network (default: eth0).
 - **OVPN_K8S_SERVICE_NETWORK**: Kubernetes service network (required).
 - **OVPN_K8S_SERVICE_SUBNET**: Kubernetes service network subnet (required).
-- **OVPN_K8S_DOMAIN**: Kuberentes cluster domain (default: cluster.local).
-- **OVPN_K8S_DNS**: Kuberentes cluster dns server (required).
 - **OVPN_K8S_DH**: Openvpn dh.pem file path (default: /etc/openvpn/pki/dh.pem).
 - **OVPN_K8S_CERTS**: Openvpn certs.p12 file path (default: /etc/openvpn/pki/certs.p12).
 - **MORE_OPTS**: Misc Openvpn options, one per line, for example `duplicate-cn`

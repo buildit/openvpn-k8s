@@ -14,9 +14,14 @@ OVPN_NATDEVICE="${OVPN_NATDEVICE:-eth0}"
 #OVPN_K8S_SERVICE_NETWORK
 #OVPN_K8S_SERVICE_SUBNET
 OVPN_K8S_DOMAIN="${OVPN_KUBE_DOMAIN:-cluster.local}"
-#OVPN_K8S_DNS
+
 OVPN_DH="${OVPN_DH:-/etc/openvpn/pki/dh.pem}"
 OVPN_CERTS="${OVPN_CERTS:-/etc/openvpn/pki/certs.p12}"
+
+# Autodetect DNS server
+OVPN_K8S_DNS=$(cat /etc/resolv.conf | grep -v '^#' | grep nameserver | awk '{print $2}')
+# Autodetect domain
+OVPN_K8S_DOMAIN=$(cat /etc/resolv.conf | grep -v '^#' | grep search | awk '{$1=""; print $0}')
 
 # Special care because k8s adds extra line break at the end of the secret
 LDAP_BIND_PASS=`echo -n "${LDAP_BIND_PASS:-ldap://corp.riglet.io}"`
