@@ -1,18 +1,21 @@
-FROM alpine:3.2
-MAINTAINER Jaka Hudoklin <jakahudoklin@gmail.com>
+FROM debian:jessie
 
 # Install openvpn
-RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
-    apk add --update openvpn iptables bash && \
-    rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
+RUN apt-get update && apt-get -y -o Dpkg::Options::="--force-confnew"  --no-install-recommends install -y \
+    openvpn libpam-ldap iptables bash \
+    && rm -rf /var/lib/apt/lists/*
 
 # Configuration files
 ENV OVPN_CONFIG /etc/openvpn/openvpn.conf
-ADD openvpn.conf /etc/openvpn/openvpn.conf
+ENV PAM_LDAP_CONFIG /etc/ldap_openvpn.conf
 
-# Expose tcp and udp port
-EXPOSE 1194/tcp
-EXPOSE 1194/udp
+ADD openvpn.conf /etc/openvpn/openvpn.conf
+ADD ldap_openvpn.conf /etc/ldap_openvpn.conf
+ADD pam.d/openvpn /etc/pam.d/openvpn
+
+# Expose tcp and udp ports
+EXPOSE 443/tcp
+EXPOSE 443/udp
 
 WORKDIR /etc/openvpn
 

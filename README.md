@@ -34,6 +34,23 @@ cd openvpn
 docker build -t offlinehacker/openvpn-k8s .
 ```
 
+# OpenVPN LDAP authentication
+
+Idea is to use openvpn to access private development environment.
+
+First idea was to use `openvpn-auth-ldap` module. Unfortunately it is not well supported and fails with segfault on modern linux builds.
+
+So we're using `openvpn-plugin-auth-pam` instead.
+
+== Troubleshooting
+
+In case it does not work and you do not know why...
+
+. Get shell in the container (either connect to running container or start sandbox with smth like `docker run --rm -ti -P --privileged --env-file env  -v `pwd`/keys/vpn.p12:/etc/openvpn/pki/certs.p12 -v `pwd`/keys/dh.pem:/etc/openvpn/pki/dh.pem  builditdigital/openvpn-ad bash`)
+. Enable logging for LDAP client (see `auth-ldap.conf`)
+. Install `apt-get install ldap-utils` and play with `ldapsearch -h 10.10.243.23 -D "CN=Administrator,CN=Users,DC=corp,DC=riglet,DC=io" -w PASS -b "CN=Users,dc=corp,dc=riglet,dc=io"`
+
+
 # Quick Start
 
 This image was created to simply have openvpn access to kubernetes cluster.
@@ -96,9 +113,13 @@ spec:
               value: 255.255.240.0
             - name: OVPN_K8S_DNS
               value: 10.241.240.10
+            - name: REQUIRE_PAM
+              value: false
+            - name: REQUIRE_CERT
+              value: true
           ports:
             - name: openvpn
-              containerPort: 1194
+              containerPort: 443
           volumeMounts:
             - mountPath: /etc/openvpn/pki
               name: openvpn
@@ -120,8 +141,8 @@ metadata:
 spec:
   ports:
     - name: openvpn
-      port: 1194
-      targetPort: 1194
+      port: 443
+      targetPort: 443
   selector:
     name: openvpn
   type: LoadBalancer
@@ -146,3 +167,18 @@ Below is the complete list of available options that can be used to customize yo
 - **MORE_OPTS**: Misc Openvpn options, one per line, for example `duplicate-cn`
 - **OVPN_K8S_POD_NETWORK**: Kubernetes pod network (optional).
 - **OVPN_K8S_POD_SUBNET**: Kubernetes pod network subnet (optional).
+- **REQUIRE_PAM**: Use PAM LDAP name/password authentication (optional, default is `true`).
+- **REQUIRE_CERT**: Use client certificate authentication (optional, default is `true`).
+- **LDAP_URL**: LDAP URL, uses prefix `ldap://` or `ldaps://` (optional, ).
+- **LDAP_BIND_NAME**: LDAP bind object (optional, default is `CN=ROUSER,CN=Users,DC=corp,DC=riglet,DC=io`).
+- **LDAP_BIND_PASS**: LDAP bind object password (optional).
+- **LDAP_BASE_NAME**: LDAP base path (optional, default is `CN=Users,DC=corp,DC=riglet,DC=io`).
+- **LDAP_LOGIN_ATTR**: User name LDAP attribute to be mapped (optional, default is `CN`).
+
+# LDAP authentication troubleshooting
+
+In case it does not work and you do not know why...
+
+. Get shell in the container (either connect to running container or start sandbox with smth like `docker run --rm -ti -P --privileged --env-file env  -v `pwd`/keys/vpn.p12:/etc/openvpn/pki/certs.p12 -v `pwd`/keys/dh.pem:/etc/openvpn/pki/dh.pem  builditdigital/openvpn-ad bash`)
+. Enable logging for LDAP client (see `auth-ldap.conf`)
+. Install `apt-get install ldap-utils` and play with `ldapsearch -h 10.10.243.23 -D "CN=Administrator,CN=Users,DC=corp,DC=riglet,DC=io" -w PASS -b "CN=Users,dc=corp,dc=riglet,dc=io"`
